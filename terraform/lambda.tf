@@ -17,11 +17,17 @@ resource "aws_lambda_function" "runner_metrics" {
   # Update these to match your deployment package location
   filename         = "../build/runner-metrics-lambda.zip"
   source_code_hash = filebase64sha256("../build/runner-metrics-lambda.zip")
-
+  
   environment {
     variables = {
+      NEWRELIC_ACCOUNT_ID            = "6746813"
+      NEWRELIC_APP_NAME              = "runner-metrics-lambda"
       NEWRELIC_LICENSE_KEY = data.aws_ssm_parameter.new_relic_license_key.value
       NEWRELIC_USER_KEY    = data.aws_ssm_parameter.new_relic_user_key.value
+      NEWRELIC_EXTENSION_ENABLED     = "true"
+      NEWRELIC_LOG_ENABLED           = "true"
+      NEWRELIC_EXTENSION_LOG_LEVEL   = "info"
+      NEWRELIC_LOG_LEVEL             = "info"
     }
   }
 }
