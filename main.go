@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"os"
 	"time"
@@ -12,6 +13,15 @@ import (
 )
 
 var app *newrelic.Application
+
+type WorkflowBody struct {
+	RunID        string `json:"run_id"`
+	Repository   string `json:"repository"`
+	RunStartedAt string `json:"run_started_at"`
+	UpdatedAt    string `json:"updated_at"`
+	Status       string `json:"status"`
+	Conclusion   string `json:"conclusion"`
+}
 
 func init() {
 	var err error
@@ -41,12 +51,29 @@ func handleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 		log.Println("Processing message")
 		log.Printf("Message ID: %s", record.MessageId)
 		log.Printf("Message Body: %s", record.Body)
+
+		var body WorkflowBody
+		if err := json.Unmarshal([]byte(record.Body), &body); err != nil {
+			log.Printf("Failed to unmarshal message body: %v", err)
+			seg.End()
+			continue
+		}
+
+		startedAt, err1 := time.Parse(time.RFC3339, body.RunStartedAt)
+		updatedAt, err2 := time.Parse(time.RFC3339, body.UpdatedAt)
+		if err1 != nil || err2 != nil {
+			log.Printf("Failed to parse timestamps: %v, %v", err1, err2)
+			seg.End()
+			continue
+		}
+
+		duration := updatedAt.Sub(startedAt)
+		log.Printf("Workflow run time: %s", duration)
+
 		seg.End()
 	}
 	return nil
 }
-
-
 
 func main() {
 	lambda.Start(handleRequest)
