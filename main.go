@@ -9,7 +9,6 @@ import (
 
 )
 
-
 func handleRequest(ctx context.Context, event json.RawMessage) error {
 	log.Println("Successfully processed")
 	return nil
