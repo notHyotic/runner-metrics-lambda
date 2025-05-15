@@ -1,3 +1,14 @@
+data "aws_ssm_parameter" "new_relic_license_key" {
+  name            = module.ssm.license_key_name
+  with_decryption = true
+}
+
+data "aws_ssm_parameter" "new_relic_user_key" {
+  name            = module.ssm.user_key_name
+  with_decryption = true
+}
+
+
 resource "aws_lambda_function" "runner_metrics" {
   function_name = "runner-metrics-lambda"
   role          = aws_iam_role.lambda_exec.arn
@@ -10,7 +21,8 @@ resource "aws_lambda_function" "runner_metrics" {
 
   environment {
     variables = {
-
+      NEWRELIC_LICENSE_KEY = data.aws_ssm_parameter.new_relic_license_key.value
+      NEWRELIC_USER_KEY    = data.aws_ssm_parameter.new_relic_user_key.value
     }
   }
 }

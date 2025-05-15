@@ -1,3 +1,4 @@
 .terraform
 runner-metrics-lambda.exe
 build
+.env
