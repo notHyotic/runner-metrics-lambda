@@ -6,7 +6,7 @@ resource "aws_lambda_function" "runner_metrics" {
 
   # Update these to match your deployment package location
   filename         = "../build/runner-metrics-lambda.zip"
-  source_code_hash = filebase64sha256("./build/runner-metrics-lambda.zip")
+  source_code_hash = filebase64sha256("../build/runner-metrics-lambda.zip")
 
   environment {
     variables = {
