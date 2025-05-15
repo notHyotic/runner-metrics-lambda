@@ -17,7 +17,8 @@ func (Ops) Build() {
 
 	// Build the binary for AWS Lambda (custom runtime expects 'bootstrap')
 	output := "bootstrap"
-	err := rnr.Run("go", "build", "-buildvcs=false", "-o", output, ".")
+	// Build only the main package in the project root (excluding .ops)
+	err := rnr.Run("go", "build", "-buildvcs=false", "-o", output, "./")
 	if err != nil {
 		log.Fatal(err)
 	}
