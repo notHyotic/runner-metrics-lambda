@@ -11,6 +11,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: hy0tic/common-runner-image:latest
     steps:
       - uses: actions/checkout@v4
         name: Checkout Repository
