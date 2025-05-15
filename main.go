@@ -70,6 +70,27 @@ func handleRequest(ctx context.Context, sqsEvent events.SQSEvent) error {
 		duration := updatedAt.Sub(startedAt)
 		log.Printf("Workflow run time: %s", duration)
 
+        // Send custom event to New Relic
+        app.RecordCustomEvent("WorkflowRun", map[string]interface{}{
+            "run_id":    body.RunID,
+            "repository": body.Repository,
+            "duration_ms": duration.Milliseconds(),
+            "conclusion":  body.Conclusion,
+            "status":      body.Status,
+            "started_at":  body.RunStartedAt,
+            "updated_at":  body.UpdatedAt,
+        })
+
+		// Extract and log job status
+        switch body.Conclusion {
+        case "success":
+            log.Printf("Job status: SUCCESS")
+        case "cancelled", "canceled":
+            log.Printf("Job status: CANCELLED")
+        default:
+            log.Printf("Job status: FAILURE (%s)", body.Conclusion)
+        }
+
 		seg.End()
 	}
 	return nil
