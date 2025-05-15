@@ -10,15 +10,15 @@ import (
 
 func (Ops) Build() {
 	var rnr = sys.Runner().WithEnv(map[string]string{
-		"GOOS":   "linux",
-		"GOARCH": "amd64",
+		"GOOS":        "linux",
+		"GOARCH":      "amd64",
+		"CGO_ENABLED": "0", // Ensure static build for Lambda compatibility
 	})
 	defer rnr.Close()
 
 	// Build the binary for AWS Lambda (custom runtime expects 'bootstrap')
 	output := "bootstrap"
-	// Build only the main package in the project root (excluding .ops)
-	err := rnr.Run("go", "build", "-buildvcs=false", "-o", output, "./")
+	err := rnr.Run("go", "build", "-buildvcs=false", "-o", output, ".")
 	if err != nil {
 		log.Fatal(err)
 	}
