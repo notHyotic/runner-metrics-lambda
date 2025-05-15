@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**.md"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout Repository
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.22.2"
+
+      - name: Install dependencies
+        run: go install lesiw.io/op@latest
+
+      - name: Run Go script
+        run: |
+          op lint
+          op build
